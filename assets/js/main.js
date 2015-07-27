@@ -3,7 +3,6 @@ var wPage = {
   init: function() {
     wPage.initStyling();
     wPage.initEvents();
-    console.log("Page initialized!");
   },
   initStyling: function() {
 
@@ -14,16 +13,13 @@ var wPage = {
   renderCWeather: function(weatherData,index,array) {
     var compiled = _.template(templates.cWeather);
     $('.weather-wrapper section').prepend(compiled(weatherData));
-    console.log("Weather rendered");
   },
   renderTraffic: function(trafficItem, index, array) {
     var compiled = _.template(templates.traffic);
     $('.traffic-ticker section p').prepend(compiled(trafficItem));
-    console.log("traffic rendered");
   },
   renderAllTraffic: function(trafficData){
-    console.log("all traffic rendered");
-    _.each(trafficData, wPage.renderTraffic);
+    _.each(trafficData.TRAFFIC_ITEM, wPage.renderTraffic);
   },
 };
 
@@ -46,18 +42,14 @@ function success(position) {
  var apiURL = api + "lat=" +  lat + "&" + "lon=" + lon +"&units=imperial" + apiKey;
  var localWeather = $.getJSON(apiURL, function(data){
   wPage.renderCWeather(data);
-  console.log(data);
 
   lat = data.coord.lat;
   lon = data.coord.lon;
 
   var mapOptions = {
-   draggable: false,
    scrollwheel: false,
-   panControl: false,
    zoom: 10,
    center: new google.maps.LatLng(lat, lon),
-   disableDefaultUI: true,
    mapTypeId: google.maps.MapTypeId.HYBRID
   }
   var map = new google.maps.Map(document.getElementById("googlemap"), mapOptions);
@@ -82,8 +74,8 @@ $(document).ready(function(){
   //Set up function to change weather on autocomplete changes
   function initializeAutoComplete() {
     var options = {
-         types: ['(cities)'],
-      componentRestrictions: {country: "us"}
+       types: ['(cities)'],
+       componentRestrictions: {country: "us"}
      };
     //Sets up the autocomplete on the input box
     var input = document.getElementById('citySearch');
@@ -91,8 +83,9 @@ $(document).ready(function(){
     //Function to run when the autocomplete input has a place change
     google.maps.event.addListener(autocomplete, 'place_changed', function() {
       var place = autocomplete.getPlace();
-      var lat = place.geometry.location.k;
-      var lon = place.geometry.location.D;
+      var lat = place.geometry.location.A;
+      var lon = place.geometry.location.F;
+
       //parse the lat and lon to 3 decimal places
       lat = parseFloat(lat.toFixed(3));
       lon = parseFloat(lon.toFixed(3));
@@ -101,12 +94,9 @@ $(document).ready(function(){
       //Creating the URL for the api Call
       var apiURL = api + "lat=" +  lat + "&" + "lon=" + lon +"&units=imperial" + apiKey;
       //Log some stuff...
-      console.log(place);
-      console.log(lat);
-      console.log(lon);
+
       //get JSON technique to retrieve data
       var localWeather = $.getJSON(apiURL, function(data) {
-        console.log(data.name);
         $('.cur-weather').remove();
         //Switch name of data to the name from the autocomplete object
         data.name = place.formatted_address;
@@ -117,12 +107,9 @@ $(document).ready(function(){
         lon = data.coord.lon;
         //Set the options for the map background
         var mapOptions = {
-           draggable: false,
            scrollwheel: false,
-           panControl: false,
            zoom: 10,
            center: new google.maps.LatLng(lat, lon),
-           disableDefaultUI: true,
            mapTypeId: google.maps.MapTypeId.HYBRID
         }
         //Create map and add traffic layer to map
@@ -135,10 +122,11 @@ $(document).ready(function(){
      //Get traffic data//
      ////////////////////
      //Get bounding box from Google Place object
-     newBBox = "&bbox=" + place.geometry.viewport.Ca.j + "," + place.geometry.viewport.va.j + ";" + place.geometry.viewport.Ca.k + "," + place.geometry.viewport.va.k;
+     console.log(place)
+     newBBox = "&bbox=" + place.geometry.viewport.ya.j + "," + place.geometry.viewport.ra.j + ";" + place.geometry.viewport.ya.A + "," + place.geometry.viewport.ra.A;
 
      tConfig = {
-       base: "http://traffic.cit.api.here.com/traffic/6.0/incidents.json?",
+       base: "http://traffic.cit.api.here.com/traffic/6.1/incidents.json?",
        bbox: newBBox,
        appID: "&app_id=2tvvsmnmOtXFsVaYHEnm",
        appCODE: "&app_code=t6iD973-SYhi0MLtjvBM4g",
@@ -153,14 +141,11 @@ $(document).ready(function(){
          type:'GET',
          dataType: 'JSON',
          crossDomain:true,
-         log:function(){
-           console.log(url);
-         },
          success: function (data) {
            console.log( tConfig.base + tConfig.bbox + tConfig.appID + tConfig.appCODE + tConfig.act + tConfig.results);
            //Render new traffic for area
            console.log(data);
-           data = data.TRAFFICITEMS.TRAFFICITEM;
+           data = data.TRAFFIC_ITEMS;
            console.log(data);
            wPage.renderAllTraffic(data);
          },

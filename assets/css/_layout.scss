@@ -1,7 +1,7 @@
 .logo {
   position:fixed;
-  top:20px;
-  left:20px;
+  bottom:80px;
+  right:20px;
   z-index:1000;
   h1 {
     font-family:$body-font;
@@ -12,7 +12,7 @@
 }
 
 .container-cust {
-  width:980px;
+  width:auto;
   margin:0 auto;
 }
 .weather-wrapper {
@@ -26,7 +26,6 @@
   padding-left:20px;
   padding-right:20px;
   padding-top:20px;
-  transition:height 1s ease;
   .minimize {
     overflow:auto;
     cursor:pointer;
@@ -37,6 +36,10 @@
       cursor:pointer;
       color:white;
       float:right;
+      transition:color .5s ease;
+      &:hover {
+        color:lighten(green, 20%);
+      }
     }
   }
   section {
